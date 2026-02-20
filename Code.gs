@@ -70,7 +70,7 @@ function doPost(e) {
     const row = [id, name, readingsStr, notes, ingredientsStr];
 
     if (rowIndex > 0) {
-      sheet.getRange(rowIndex, 1, rowIndex, 5).setValues([row]);
+      sheet.getRange(rowIndex, 1, 1, 5).setValues([row]);
     } else {
       sheet.appendRow(row);
     }
