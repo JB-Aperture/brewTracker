@@ -1,0 +1,153 @@
+/* View switching: only one view visible at a time */
+[data-view="list"] .detail-view,
+[data-view="detail"] .list-view {
+  display: none;
+}
+
+[data-view="detail"] .detail-view {
+  display: block;
+}
+
+/* Card list */
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pico-spacing);
+  margin-top: var(--pico-spacing);
+}
+
+@media (min-width: 768px) {
+  .card-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.card-list article,
+.brew-card {
+  padding: var(--pico-spacing);
+  border: 1px solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card-list article:hover,
+.card-list article:focus-within,
+.brew-card:hover,
+.brew-card:focus-within {
+  box-shadow: 0 0 0 2px var(--pico-primary);
+}
+
+.brew-card h4 {
+  margin: 0 0 0.25rem 0;
+}
+
+.brew-card .brew-date {
+  font-size: 0.9rem;
+  color: var(--pico-muted-color);
+}
+
+/* Detail view layout */
+.detail-view section {
+  margin-bottom: var(--pico-block-spacing-vertical);
+}
+
+/* Chart container */
+.chart-container {
+  height: 220px;
+  width: 100%;
+  margin-bottom: var(--pico-spacing);
+}
+
+.chart-container canvas {
+  max-height: 220px;
+}
+
+/* Comments: display vs edit */
+.comments-display {
+  white-space: pre-wrap;
+  min-height: 2rem;
+  color: var(--pico-muted-color);
+}
+
+.comments-display:not(:empty) {
+  color: var(--pico-color);
+}
+
+.comments-edit.hidden,
+#comments-edit-btn.hidden {
+  display: none;
+}
+
+.comments-edit textarea {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+/* Ingredients list with actions */
+#ingredients-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+#ingredients-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--pico-muted-border-color);
+}
+
+#ingredients-list li:last-child {
+  border-bottom: none;
+}
+
+.ingredient-text {
+  flex: 1;
+}
+
+.ingredient-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.ingredient-actions button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+}
+
+/* Inline edit state for ingredient */
+.ingredient-edit-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  flex: 1;
+}
+
+.ingredient-edit-form input {
+  width: auto;
+  min-width: 5rem;
+}
+
+/* Utility */
+.hidden {
+  display: none !important;
+}
+
+/* Touch-friendly tap targets */
+button,
+.brew-card {
+  min-height: 44px;
+}
+
+button.secondary {
+  margin-right: 0.25rem;
+}
+
+#fetch-error {
+  color: var(--pico-del-color);
+}

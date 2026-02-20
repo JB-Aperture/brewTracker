@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Home Brew Tracker</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="container" data-view="list">
+      <!-- List view -->
+      <section id="list-view" class="list-view">
+        <nav>
+          <h1>My Brews</h1>
+          <button type="button" id="new-brew-toggle" class="secondary">
+            Start New Brew
+          </button>
+        </nav>
+
+        <form id="start-brew-form" class="hidden">
+          <label for="new-brew-name">Brew name</label>
+          <input type="text" id="new-brew-name" required placeholder="e.g. Morgans Ginger Beer" />
+          <label for="new-brew-notes">Notes (optional)</label>
+          <textarea id="new-brew-notes" placeholder="Initial notes..."></textarea>
+          <button type="submit">Create Brew</button>
+          <button type="button" id="cancel-new-brew" class="secondary">Cancel</button>
+        </form>
+
+        <div id="card-list" class="card-list" aria-label="Brew list"></div>
+        <p id="fetch-error" class="hidden" role="alert"></p>
+      </section>
+
+      <!-- Detail view -->
+      <section id="detail-view" class="detail-view hidden">
+        <nav>
+          <button type="button" id="back-btn">Back</button>
+          <h2 id="detail-name"></h2>
+        </nav>
+
+        <div class="chart-container">
+          <canvas id="sg-chart" aria-label="SG readings over time"></canvas>
+        </div>
+
+        <section aria-labelledby="comments-heading">
+          <h3 id="comments-heading">Comments</h3>
+          <div id="comments-display" class="comments-display"></div>
+          <div id="comments-edit" class="comments-edit hidden">
+            <textarea id="comments-textarea" rows="4"></textarea>
+            <button type="button" id="comments-save">Save</button>
+            <button type="button" id="comments-cancel" class="secondary">Cancel</button>
+          </div>
+          <button type="button" id="comments-edit-btn" class="secondary">Edit</button>
+        </section>
+
+        <section aria-labelledby="ingredients-heading">
+          <h3 id="ingredients-heading">Ingredients</h3>
+          <ul id="ingredients-list"></ul>
+          <form id="add-ingredient-form">
+            <label for="ingredient-item">Item</label>
+            <input type="text" id="ingredient-item" placeholder="e.g. Sugar" />
+            <label for="ingredient-cost">Cost</label>
+            <input type="number" id="ingredient-cost" placeholder="0" min="0" step="0.01" />
+            <button type="submit">Add ingredient</button>
+          </form>
+        </section>
+
+        <section aria-labelledby="log-reading-heading">
+          <h3 id="log-reading-heading">Log New Reading</h3>
+          <form id="log-reading-form">
+            <label for="reading-date">Date</label>
+            <input type="text" id="reading-date" required placeholder="e.g. 03/02/26" />
+            <label for="reading-sg">SG</label>
+            <input type="number" id="reading-sg" required placeholder="1026" min="1000" step="1" />
+            <label for="reading-temp">Temp (°C)</label>
+            <input type="number" id="reading-temp" placeholder="28" step="0.1" />
+            <button type="submit">Add reading</button>
+          </form>
+        </section>
+      </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
