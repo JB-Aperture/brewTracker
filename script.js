@@ -21,18 +21,25 @@ function parseJsonColumn(val) {
   }
 }
 
+function parseFermenting(val) {
+  if (val === false || val === 'false' || val === '0' || val === 0) return false;
+  return true; // default true for backward compat (missing column = fermenting)
+}
+
 function normalizeRow(row) {
   const id = row.id ?? row[0] ?? '';
   const name = row.name ?? row[1] ?? '';
   const readingsRaw = row.readings ?? row[2];
   const notes = row.notes ?? row[3] ?? '';
   const ingredientsRaw = row.ingredients ?? row[4];
+  const fermentingRaw = row.fermenting ?? row[5];
   return {
     id: String(id).trim(),
     name: String(name).trim(),
     readings: parseJsonColumn(readingsRaw),
     notes: String(notes ?? '').trim(),
     ingredients: parseJsonColumn(ingredientsRaw),
+    fermenting: parseFermenting(fermentingRaw),
   };
 }
 
@@ -135,8 +142,10 @@ function getBrewStats(brew) {
     stats.days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   }
 
-  // Determine status based on SG trend
-  if (readings.length >= 2) {
+  // User can mark complete; otherwise infer from SG trend
+  if (brew.fermenting === false) {
+    stats.status = 'COMPLETE';
+  } else if (readings.length >= 2) {
     const recentReadings = readings.slice(-3);
     const sgValues = recentReadings.map(r => Number(r.SG)).filter(v => !isNaN(v));
     if (sgValues.length >= 2) {
@@ -302,6 +311,20 @@ function showDetail(id) {
   $('#stat-abv').textContent = stats.abv != null ? `${stats.abv}%` : '—';
   $('#stat-days').textContent = stats.days != null ? stats.days : '—';
   $('#stat-readings').textContent = stats.count;
+
+  // Mark complete / Mark fermenting button
+  const markCompleteBtn = $('#mark-complete-btn');
+  if (brew.fermenting === false) {
+    markCompleteBtn.textContent = 'Mark as fermenting';
+    markCompleteBtn.className = 'secondary';
+  } else {
+    markCompleteBtn.textContent = 'Mark as complete';
+    markCompleteBtn.className = 'secondary';
+  }
+  markCompleteBtn.onclick = () => {
+    brew.fermenting = !brew.fermenting;
+    postBrew(brew).then(() => showDetail(brew.id));
+  };
 
   // Chart
   destroySgChart();
@@ -471,6 +494,7 @@ async function postBrew(payload) {
     readings: Array.isArray(payload.readings) ? payload.readings : [],
     notes: payload.notes ?? '',
     ingredients: Array.isArray(payload.ingredients) ? payload.ingredients : [],
+    fermenting: payload.fermenting !== false,
   };
   try {
     const res = await fetch(GAS_WEB_APP_URL, {
@@ -514,6 +538,7 @@ function init() {
       readings: [],
       notes: notesInput.value.trim(),
       ingredients: [],
+      fermenting: true,
     };
     try {
       await postBrew(brew);

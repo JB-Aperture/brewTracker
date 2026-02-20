@@ -86,6 +86,10 @@ body {
   margin-left: 0.5rem;
 }
 
+.brew-card .brew-status.complete {
+  background: #2e7d32;
+}
+
 /* Detail view */
 .detail-header {
   margin-bottom: 1.5rem;
@@ -129,6 +133,10 @@ body {
   border-radius: 1rem;
   background: var(--accent-color);
   color: #fff;
+}
+
+.status-badge.complete {
+  background: #2e7d32;
 }
 
 .brew-meta {
