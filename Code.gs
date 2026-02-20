@@ -2,7 +2,7 @@
  * Home Brew Tracker — Google Apps Script backend
  *
  * Setup:
- * 1. Create a Google Sheet with header row: id | name | readings | notes | ingredients | fermenting
+ * 1. Create a Google Sheet with header row: id | name | readings | notes | ingredients | completedAt
  * 2. In Apps Script: either bind this script to the sheet (Extensions > Apps Script)
  *    and use getActiveSpreadsheet(), OR set SPREADSHEET_ID below to your sheet ID.
  * 3. Deploy as Web App: Execute as "Me", Who has access: "Anyone" (or "Anyone with Google account").
@@ -25,8 +25,8 @@ function getSheet() {
 }
 
 /**
- * Handles POST from the front end. Body: { id, name, readings, notes, ingredients, fermenting }
- * fermenting is boolean (true/false); stored as "true"/"false" in column F.
+ * Handles POST from the front end. Body: { id, name, readings, notes, ingredients, completedAt }
+ * completedAt is empty (fermenting) or "YYYY-MM-DD" (finished on that date). Stored in column F.
  * Creates a new row if id not found, otherwise updates the existing row.
  */
 function doPost(e) {
@@ -45,7 +45,7 @@ function doPost(e) {
     const readings = Array.isArray(payload.readings) ? payload.readings : [];
     const notes = payload.notes != null ? String(payload.notes) : '';
     const ingredients = Array.isArray(payload.ingredients) ? payload.ingredients : [];
-    const fermenting = payload.fermenting !== false;
+    const completedAt = payload.completedAt != null && payload.completedAt !== '' ? String(payload.completedAt).trim() : '';
 
     if (!id) {
       output.setContent(JSON.stringify({ success: false, error: 'Missing id' }));
@@ -67,8 +67,7 @@ function doPost(e) {
 
     const readingsStr = JSON.stringify(readings);
     const ingredientsStr = JSON.stringify(ingredients);
-    const fermentingStr = fermenting ? 'true' : 'false';
-    const row = [id, name, readingsStr, notes, ingredientsStr, fermentingStr];
+    const row = [id, name, readingsStr, notes, ingredientsStr, completedAt];
 
     if (rowIndex > 0) {
       sheet.getRange(rowIndex, 1, 1, 6).setValues([row]);

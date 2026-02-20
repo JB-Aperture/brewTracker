@@ -20,11 +20,27 @@ function parseJsonColumn(val) {
   }
 }
 
-function parseFermenting(val) {
-  if (val === false || val === 0) return false;
-  const s = typeof val === 'string' ? val.trim().toLowerCase() : String(val).toLowerCase();
-  if (s === 'false' || s === '0' || s === 'no') return false;
-  return true; // default true for backward compat (missing column = fermenting)
+/**
+ * Parse column F: empty/"true" = still fermenting (null). "false" or date string = complete.
+ * Returns null (fermenting) or "YYYY-MM-DD" (completion date).
+ */
+function parseCompletedAt(val) {
+  if (val == null) return null;
+  const s = typeof val === 'string' ? val.trim() : String(val);
+  if (s === '') return null;
+  const lower = s.toLowerCase();
+  if (lower === 'true') return null;
+  if (lower === 'false') return null; // old data: complete with no date (handled via completedNoDate)
+  // Date: YYYY-MM-DD or try to parse
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const d = parseDate(s);
+  if (d && !isNaN(d.getTime())) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+  return null;
 }
 
 function normalizeRow(row) {
@@ -33,14 +49,18 @@ function normalizeRow(row) {
   const readingsRaw = row.readings ?? row[2];
   const notes = row.notes ?? row[3] ?? '';
   const ingredientsRaw = row.ingredients ?? row[4];
-  const fermentingRaw = row.fermenting ?? row.Fermenting ?? row.FERMENTING ?? row[5];
+  const completedAtRaw = row.completedAt ?? row.CompletedAt ?? row.fermenting ?? row.Fermenting ?? row[5];
+  const parsed = parseCompletedAt(completedAtRaw);
+  const lower = typeof completedAtRaw === 'string' ? completedAtRaw.trim().toLowerCase() : '';
+  const completedNoDate = lower === 'false'; // old sheet data: complete but no date
   return {
     id: String(id).trim(),
     name: String(name).trim(),
     readings: parseJsonColumn(readingsRaw),
     notes: String(notes ?? '').trim(),
     ingredients: parseJsonColumn(ingredientsRaw),
-    fermenting: parseFermenting(fermentingRaw),
+    completedAt: parsed,
+    completedNoDate,
   };
 }
 
@@ -136,15 +156,20 @@ function getBrewStats(brew) {
     stats.abv = ((ogNorm - fgNorm) * 131.25).toFixed(1);
   }
 
-  // Calculate days fermenting
-  if (stats.startDate && !isNaN(stats.startDate.getTime())) {
+  // End date: if complete, use completedAt date; else use today (still fermenting)
+  const endDate = brew.completedAt ? parseDate(brew.completedAt) : (brew.completedNoDate ? new Date() : null);
+  const stillFermenting = !brew.completedAt && !brew.completedNoDate;
+
+  if (stats.startDate && !isNaN(stats.startDate.getTime()) && endDate && !isNaN(endDate.getTime())) {
+    const diffMs = endDate - stats.startDate;
+    stats.days = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+  } else if (stats.startDate && stillFermenting) {
     const now = new Date();
-    const diffMs = now - stats.startDate;
-    stats.days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    stats.days = Math.floor((now - stats.startDate) / (1000 * 60 * 60 * 24));
   }
 
-  // User can mark complete; otherwise infer from SG trend
-  if (brew.fermenting === false) {
+  // Complete if we have a completion date or old "false" flag
+  if (brew.completedAt || brew.completedNoDate) {
     stats.status = 'COMPLETE';
   } else if (readings.length >= 2) {
     const recentReadings = readings.slice(-3);
@@ -306,6 +331,8 @@ function showDetail(id) {
   $('#start-date').innerHTML = stats.startDate ? `📅 ${formatDate(stats.startDate)}` : '';
   $('#og-display').innerHTML = stats.og != null ? `⚗ OG: ${formatSG(stats.og)}` : '';
   $('#current-sg-display').innerHTML = stats.current != null ? `📉 Current: ${formatSG(stats.current)}` : '';
+  const completedEl = $('#completed-date');
+  completedEl.textContent = brew.completedAt ? `✓ Finished: ${formatDate(parseDate(brew.completedAt))}` : '';
 
   // Stats cards
   $('#stat-current-sg').textContent = formatSG(stats.current);
@@ -313,9 +340,12 @@ function showDetail(id) {
   $('#stat-days').textContent = stats.days != null ? stats.days : '—';
   $('#stat-readings').textContent = stats.count;
 
-  // Mark complete / Mark fermenting button
+  // Mark complete (with date picker) / Mark fermenting button
   const markCompleteBtn = $('#mark-complete-btn');
-  if (brew.fermenting === false) {
+  const completeDialog = $('#complete-dialog');
+  const completeDateInput = $('#complete-date');
+  const isComplete = !!(brew.completedAt || brew.completedNoDate);
+  if (isComplete) {
     markCompleteBtn.textContent = 'Mark as fermenting';
     markCompleteBtn.className = 'secondary';
   } else {
@@ -323,7 +353,24 @@ function showDetail(id) {
     markCompleteBtn.className = 'secondary';
   }
   markCompleteBtn.onclick = () => {
-    brew.fermenting = !brew.fermenting;
+    if (isComplete) {
+      brew.completedAt = null;
+      brew.completedNoDate = false;
+      postBrew(brew).then(() => showDetail(brew.id));
+    } else {
+      completeDateInput.value = new Date().toISOString().slice(0, 10);
+      completeDialog.showModal();
+    }
+  };
+  $('#complete-dialog-close').onclick = () => completeDialog.close();
+  completeDialog.onclick = (e) => { if (e.target === completeDialog) completeDialog.close(); };
+  $('#complete-dialog-form').onsubmit = (e) => {
+    e.preventDefault();
+    const dateVal = completeDateInput.value;
+    if (!dateVal) return;
+    brew.completedAt = dateVal;
+    brew.completedNoDate = false;
+    completeDialog.close();
     postBrew(brew).then(() => showDetail(brew.id));
   };
 
@@ -495,7 +542,7 @@ async function postBrew(payload) {
     readings: Array.isArray(payload.readings) ? payload.readings : [],
     notes: payload.notes ?? '',
     ingredients: Array.isArray(payload.ingredients) ? payload.ingredients : [],
-    fermenting: payload.fermenting !== false,
+    completedAt: payload.completedAt ?? null,
   };
   try {
     const res = await fetch(GAS_WEB_APP_URL, {
@@ -507,10 +554,10 @@ async function postBrew(payload) {
       throw new Error(data.error || `Request failed: ${res.status}`);
     }
     await fetchBrews();
-    // Apply saved fermenting to refetched brew so UI reflects it (CSV may be cached)
     const refetched = getBrewById(payload.id);
-    if (refetched && payload.hasOwnProperty('fermenting')) {
-      refetched.fermenting = payload.fermenting !== false;
+    if (refetched && payload.hasOwnProperty('completedAt')) {
+      refetched.completedAt = payload.completedAt ?? null;
+      refetched.completedNoDate = false;
     }
     return data;
   } catch (e) {
@@ -544,7 +591,7 @@ function init() {
       readings: [],
       notes: notesInput.value.trim(),
       ingredients: [],
-      fermenting: true,
+      completedAt: null,
     };
     try {
       await postBrew(brew);

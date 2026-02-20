@@ -49,6 +49,7 @@
             <span id="start-date"></span>
             <span id="og-display"></span>
             <span id="current-sg-display"></span>
+            <span id="completed-date" class="completed-meta"></span>
           </p>
           <div class="header-actions">
             <button type="button" id="add-reading-btn" class="primary">+ Add Reading</button>
@@ -97,6 +98,21 @@
               <label for="reading-temp">Temperature (°C)</label>
               <input type="number" id="reading-temp" placeholder="20" step="0.1" />
               <button type="submit">Save Reading</button>
+            </form>
+          </article>
+        </dialog>
+
+        <!-- Mark as complete: date picker -->
+        <dialog id="complete-dialog">
+          <article>
+            <header>
+              <button type="button" id="complete-dialog-close" aria-label="Close" class="close-btn">&times;</button>
+              <h3>Mark as complete</h3>
+            </header>
+            <form id="complete-dialog-form">
+              <label for="complete-date">Completion date</label>
+              <input type="date" id="complete-date" required />
+              <button type="submit">Save</button>
             </form>
           </article>
         </dialog>
