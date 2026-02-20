@@ -21,7 +21,9 @@ function parseJsonColumn(val) {
 }
 
 function parseFermenting(val) {
-  if (val === false || val === 'false' || val === '0' || val === 0) return false;
+  if (val === false || val === 0) return false;
+  const s = typeof val === 'string' ? val.trim().toLowerCase() : String(val).toLowerCase();
+  if (s === 'false' || s === '0' || s === 'no') return false;
   return true; // default true for backward compat (missing column = fermenting)
 }
 
@@ -31,7 +33,7 @@ function normalizeRow(row) {
   const readingsRaw = row.readings ?? row[2];
   const notes = row.notes ?? row[3] ?? '';
   const ingredientsRaw = row.ingredients ?? row[4];
-  const fermentingRaw = row.fermenting ?? row[5];
+  const fermentingRaw = row.fermenting ?? row.Fermenting ?? row.FERMENTING ?? row[5];
   return {
     id: String(id).trim(),
     name: String(name).trim(),
@@ -505,6 +507,11 @@ async function postBrew(payload) {
       throw new Error(data.error || `Request failed: ${res.status}`);
     }
     await fetchBrews();
+    // Apply saved fermenting to refetched brew so UI reflects it (CSV may be cached)
+    const refetched = getBrewById(payload.id);
+    if (refetched && payload.hasOwnProperty('fermenting')) {
+      refetched.fermenting = payload.fermenting !== false;
+    }
     return data;
   } catch (e) {
     alert(e.message || 'Failed to save.');
