@@ -1,0 +1,19 @@
+{
+  "name": "Home Brew Tracker",
+  "short_name": "Brew Tracker",
+  "description": "Track your home brews, gravity readings, and fermentation",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#e8a030",
+  "background_color": "#fafafa",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

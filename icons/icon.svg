@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Pint glass outline: rim, body, base -->
+  <path d="M28 22 L72 22 L66 68 L34 68 L28 22 Z" stroke="#e8a030" stroke-width="3" fill="none" stroke-linejoin="round"/>
+  <path d="M34 68 L30 78 L70 78 L66 68" stroke="#e8a030" stroke-width="3" fill="none" stroke-linejoin="round"/>
+  <!-- Beer fill -->
+  <path d="M30 28 L68 28 L62 66 L36 66 Z" fill="#e8a030" opacity="0.5"/>
+  <!-- Foam -->
+  <path d="M30 28 L68 28 L62 34 L36 34 Z" fill="#f5e6c8"/>
+</svg>
