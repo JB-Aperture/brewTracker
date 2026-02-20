@@ -1,4 +1,22 @@
-/* View switching: only one view visible at a time */
+:root {
+  --accent-color: #e8a030;
+  --accent-light: #fff8ee;
+}
+
+body {
+  background: #fafafa;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: var(--pico-background-color);
+  }
+  :root {
+    --accent-light: #2a2518;
+  }
+}
+
+/* View switching */
 [data-view="list"] .detail-view,
 [data-view="detail"] .list-view {
   display: none;
@@ -23,61 +41,242 @@
   }
 }
 
-.card-list article,
 .brew-card {
   padding: var(--pico-spacing);
+  background: #fff;
   border: 1px solid var(--pico-muted-border-color);
   border-radius: var(--pico-border-radius);
   cursor: pointer;
-  transition: box-shadow 0.15s ease;
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.card-list article:hover,
-.card-list article:focus-within,
+@media (prefers-color-scheme: dark) {
+  .brew-card {
+    background: var(--pico-card-background-color);
+  }
+}
+
 .brew-card:hover,
 .brew-card:focus-within {
-  box-shadow: 0 0 0 2px var(--pico-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .brew-card h4 {
   margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
 }
 
 .brew-card .brew-date {
   font-size: 0.9rem;
   color: var(--pico-muted-color);
+  margin: 0;
 }
 
-/* Detail view layout */
-.detail-view section {
-  margin-bottom: var(--pico-block-spacing-vertical);
+.brew-card .brew-status {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 0.15rem 0.5rem;
+  border-radius: 1rem;
+  background: var(--accent-color);
+  color: #fff;
+  margin-left: 0.5rem;
 }
 
-/* Chart container */
+/* Detail view */
+.detail-header {
+  margin-bottom: 1.5rem;
+}
+
+.back-link {
+  background: none;
+  border: none;
+  color: var(--pico-muted-color);
+  font-size: 0.9rem;
+  padding: 0;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.back-link:hover {
+  color: var(--pico-primary);
+}
+
+.brew-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.25rem;
+}
+
+.brew-title-row h1 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.status-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  background: var(--accent-color);
+  color: #fff;
+}
+
+.brew-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: var(--pico-muted-color);
+  margin: 0.5rem 0 1rem 0;
+}
+
+.brew-meta span::before {
+  margin-right: 0.25rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.header-actions .primary {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: var(--pico-border-radius);
+  padding: 1rem;
+  text-align: left;
+  margin: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  .stat-card {
+    background: var(--pico-card-background-color);
+  }
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--pico-muted-color);
+  margin: 0 0 0.25rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--pico-color);
+}
+
+.stat-highlight {
+  color: var(--accent-color);
+}
+
+/* Chart card */
+.chart-card {
+  background: #fff;
+  border-radius: var(--pico-border-radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  .chart-card {
+    background: var(--pico-card-background-color);
+  }
+}
+
+.chart-card h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
 .chart-container {
-  height: 220px;
+  height: 200px;
   width: 100%;
-  margin-bottom: var(--pico-spacing);
 }
 
 .chart-container canvas {
-  max-height: 220px;
+  max-height: 200px;
 }
 
-/* Comments: display vs edit */
+/* Detail sections */
+.detail-section {
+  background: #fff;
+  border-radius: var(--pico-border-radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  .detail-section {
+    background: var(--pico-card-background-color);
+  }
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+button.small {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+/* Comments */
 .comments-display {
   white-space: pre-wrap;
-  min-height: 2rem;
+  min-height: 1.5rem;
   color: var(--pico-muted-color);
+  font-style: italic;
 }
 
 .comments-display:not(:empty) {
   color: var(--pico-color);
+  font-style: normal;
 }
 
-.comments-edit.hidden,
-#comments-edit-btn.hidden {
+.comments-edit.hidden {
   display: none;
 }
 
@@ -86,10 +285,20 @@
   margin-bottom: 0.5rem;
 }
 
-/* Ingredients list with actions */
+.edit-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+#comments-edit-btn.hidden {
+  display: none;
+}
+
+/* Ingredients */
 #ingredients-list {
   list-style: none;
   padding-left: 0;
+  margin: 0 0 0.75rem 0;
 }
 
 #ingredients-list li {
@@ -97,7 +306,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.35rem 0;
+  padding: 0.5rem 0;
   border-bottom: 1px solid var(--pico-muted-border-color);
 }
 
@@ -109,17 +318,50 @@
   flex: 1;
 }
 
+.ingredient-cost {
+  font-weight: 500;
+  color: var(--pico-muted-color);
+}
+
 .ingredient-actions {
   display: flex;
   gap: 0.25rem;
 }
 
 .ingredient-actions button {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.85rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
 }
 
-/* Inline edit state for ingredient */
+.add-ingredient-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.add-ingredient-form input {
+  flex: 1;
+  min-width: 80px;
+  margin-bottom: 0;
+}
+
+.add-ingredient-form input[type="number"] {
+  max-width: 80px;
+}
+
+.add-ingredient-form button {
+  margin-bottom: 0;
+}
+
+.total-cost {
+  text-align: right;
+  font-weight: 600;
+  margin: 0.5rem 0 0 0;
+  color: var(--pico-muted-color);
+}
+
+/* Ingredient inline edit */
 .ingredient-edit-form {
   display: flex;
   flex-wrap: wrap;
@@ -130,7 +372,53 @@
 
 .ingredient-edit-form input {
   width: auto;
-  min-width: 5rem;
+  min-width: 4rem;
+  margin-bottom: 0;
+}
+
+/* Dialog / Modal */
+dialog {
+  border: none;
+  border-radius: var(--pico-border-radius);
+  padding: 0;
+  max-width: 90vw;
+  width: 400px;
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+dialog article {
+  margin: 0;
+}
+
+dialog header {
+  position: relative;
+  padding: 1rem;
+  border-bottom: 1px solid var(--pico-muted-border-color);
+}
+
+dialog header h3 {
+  margin: 0;
+  padding-right: 2rem;
+}
+
+.close-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  color: var(--pico-muted-color);
+}
+
+dialog form {
+  padding: 1rem;
 }
 
 /* Utility */
@@ -138,16 +426,27 @@
   display: none !important;
 }
 
-/* Touch-friendly tap targets */
+/* Touch-friendly */
 button,
 .brew-card {
   min-height: 44px;
 }
 
-button.secondary {
-  margin-right: 0.25rem;
-}
-
 #fetch-error {
   color: var(--pico-del-color);
+}
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+  .brew-title-row h1 {
+    font-size: 1.4rem;
+  }
+  
+  .stat-value {
+    font-size: 1.4rem;
+  }
+  
+  .brew-meta {
+    font-size: 0.8rem;
+  }
 }

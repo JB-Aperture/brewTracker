@@ -4,6 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <title>Home Brew Tracker</title>
     <link
       rel="stylesheet"
@@ -18,7 +20,7 @@
         <nav>
           <h1>My Brews</h1>
           <button type="button" id="new-brew-toggle" class="secondary">
-            Start New Brew
+            + New Brew
           </button>
         </nav>
 
@@ -37,50 +39,94 @@
 
       <!-- Detail view -->
       <section id="detail-view" class="detail-view hidden">
-        <nav>
-          <button type="button" id="back-btn">Back</button>
-          <h2 id="detail-name"></h2>
-        </nav>
+        <header class="detail-header">
+          <button type="button" id="back-btn" class="back-link">← Back to Brews</button>
+          <div class="brew-title-row">
+            <h1 id="detail-name"></h1>
+            <span id="status-badge" class="status-badge">FERMENTING</span>
+          </div>
+          <p class="brew-meta">
+            <span id="start-date"></span>
+            <span id="og-display"></span>
+            <span id="current-sg-display"></span>
+          </p>
+          <div class="header-actions">
+            <button type="button" id="add-reading-btn" class="primary">+ Add Reading</button>
+          </div>
+        </header>
 
-        <div class="chart-container">
-          <canvas id="sg-chart" aria-label="SG readings over time"></canvas>
+        <div class="stats-grid">
+          <article class="stat-card">
+            <p class="stat-label">Current Gravity</p>
+            <p class="stat-value" id="stat-current-sg">—</p>
+          </article>
+          <article class="stat-card">
+            <p class="stat-label">ABV (Approx)</p>
+            <p class="stat-value stat-highlight" id="stat-abv">—</p>
+          </article>
+          <article class="stat-card">
+            <p class="stat-label">Days Fermenting</p>
+            <p class="stat-value" id="stat-days">—</p>
+          </article>
+          <article class="stat-card">
+            <p class="stat-label">Readings</p>
+            <p class="stat-value" id="stat-readings">0</p>
+          </article>
         </div>
 
-        <section aria-labelledby="comments-heading">
-          <h3 id="comments-heading">Comments</h3>
+        <article class="chart-card">
+          <h3>Fermentation Progress</h3>
+          <div class="chart-container">
+            <canvas id="sg-chart" aria-label="SG readings over time"></canvas>
+          </div>
+        </article>
+
+        <!-- Add Reading Modal/Form -->
+        <dialog id="reading-dialog">
+          <article>
+            <header>
+              <button type="button" id="close-reading-dialog" aria-label="Close" class="close-btn">&times;</button>
+              <h3>Log New Reading</h3>
+            </header>
+            <form id="log-reading-form">
+              <label for="reading-date">Date</label>
+              <input type="date" id="reading-date" required />
+              <label for="reading-sg">Specific Gravity (SG)</label>
+              <input type="number" id="reading-sg" required placeholder="1046" min="900" max="1200" step="1" />
+              <label for="reading-temp">Temperature (°C)</label>
+              <input type="number" id="reading-temp" placeholder="20" step="0.1" />
+              <button type="submit">Save Reading</button>
+            </form>
+          </article>
+        </dialog>
+
+        <article class="detail-section">
+          <header class="section-header">
+            <h3>Notes</h3>
+            <button type="button" id="comments-edit-btn" class="secondary small">Edit</button>
+          </header>
           <div id="comments-display" class="comments-display"></div>
           <div id="comments-edit" class="comments-edit hidden">
             <textarea id="comments-textarea" rows="4"></textarea>
-            <button type="button" id="comments-save">Save</button>
-            <button type="button" id="comments-cancel" class="secondary">Cancel</button>
+            <div class="edit-actions">
+              <button type="button" id="comments-save">Save</button>
+              <button type="button" id="comments-cancel" class="secondary">Cancel</button>
+            </div>
           </div>
-          <button type="button" id="comments-edit-btn" class="secondary">Edit</button>
-        </section>
+        </article>
 
-        <section aria-labelledby="ingredients-heading">
-          <h3 id="ingredients-heading">Ingredients</h3>
+        <article class="detail-section">
+          <header class="section-header">
+            <h3>Ingredients</h3>
+          </header>
           <ul id="ingredients-list"></ul>
-          <form id="add-ingredient-form">
-            <label for="ingredient-item">Item</label>
-            <input type="text" id="ingredient-item" placeholder="e.g. Sugar" />
-            <label for="ingredient-cost">Cost</label>
-            <input type="number" id="ingredient-cost" placeholder="0" min="0" step="0.01" />
-            <button type="submit">Add ingredient</button>
+          <form id="add-ingredient-form" class="add-ingredient-form">
+            <input type="text" id="ingredient-item" placeholder="Item name" />
+            <input type="number" id="ingredient-cost" placeholder="Cost" min="0" step="0.01" />
+            <button type="submit">Add</button>
           </form>
-        </section>
-
-        <section aria-labelledby="log-reading-heading">
-          <h3 id="log-reading-heading">Log New Reading</h3>
-          <form id="log-reading-form">
-            <label for="reading-date">Date</label>
-            <input type="text" id="reading-date" required placeholder="e.g. 03/02/26" />
-            <label for="reading-sg">SG</label>
-            <input type="number" id="reading-sg" required placeholder="1026" min="1000" step="1" />
-            <label for="reading-temp">Temp (°C)</label>
-            <input type="number" id="reading-temp" placeholder="28" step="0.1" />
-            <button type="submit">Add reading</button>
-          </form>
-        </section>
+          <p class="total-cost">Total: $<span id="ingredients-total">0.00</span></p>
+        </article>
       </section>
     </main>
 
