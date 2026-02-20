@@ -2,8 +2,7 @@
  * Home Brew Tracker
  */
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSVe8hHHlMGQDDF7v-Uq9Pocrhkpmfi9OeWlDiOwKGRO9A6JnyNnuP0AStsrGLAn7BMXwjmBMkRXArK/pub?gid=0&single=true&output=csv';
-// const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbykXb0YeMoDNOaoIhpWwQIkeJnJCh8eJGn5LkhLsE6Ee-nkBFqdL1zKzbCbmTCzDYKT/exec';
-const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz6l0HHZE5FsKORKFMj6dHfuOrnrdwv-wjXSt1ss1PZae29GbZXhnL3LygLiNRMGU23/exec';
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbykXb0YeMoDNOaoIhpWwQIkeJnJCh8eJGn5LkhLsE6Ee-nkBFqdL1zKzbCbmTCzDYKT/exec';
 
 let brews = [];
 let sgChart = null;
